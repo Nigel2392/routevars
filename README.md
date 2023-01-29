@@ -5,9 +5,8 @@ Easily get variables from any url.
 ## Example
 
 ```go
-	var path = "/users/<<id:int>>/<<name:string>>"
-	var other = "/users/1234/john"
-	var ok, vars = Match(path, other)
+	var path = "/users/1234/john"
+	var ok, vars = Match("/users/<<id:int>>/<<name:string>>", path)
 	if ok {
 		fmt.Println("Matched!")
 		for k, v := range vars {

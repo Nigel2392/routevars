@@ -74,13 +74,18 @@ func Match(path, pathToMatch string) (bool, map[string]string) {
 	if path, ok := paths[path]; ok {
 		return matchRegex(path, pathToMatch)
 	}
+
+	if path == pathToMatch && !isRegexRoute(path) {
+		return true, nil
+	}
+
 	var regex = ""
 	var hasPrefixSlash = strings.HasPrefix(path, "/")
 	var hasTrailingSlash = strings.HasSuffix(path, "/")
 	if hasPrefixSlash {
 		path = path[1:]
 	}
-	if hasTrailingSlash {
+	if hasTrailingSlash && len(path) > 1 && !hasPrefixSlash {
 		path = path[:len(path)-1]
 	}
 	var parts = strings.Split(path, "/")
@@ -98,6 +103,11 @@ func Match(path, pathToMatch string) (bool, map[string]string) {
 	paths[path] = regex
 
 	return matchRegex(regex, pathToMatch)
+}
+
+// Check if a path is a regex route.
+func isRegexRoute(path string) bool {
+	return strings.Contains(path, RT_PATH_VAR_PREFIX) && strings.Contains(path, RT_PATH_VAR_SUFFIX)
 }
 
 func matchRegex(regex, pathToMatch string) (bool, map[string]string) {
