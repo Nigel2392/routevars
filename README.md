@@ -3,14 +3,13 @@
 Easily get variables from any url.
 
 ## Example
-
 ```go
 	var path = "/users/1234/john"
-	var ok, vars = Match("/users/<<id:int>>/<<name:string>>", path)
+	var ok, vars = routevars.Match("/users/<<id:int>>/<<name:string>>", path)
 	if ok {
-		fmt.Println("Matched!")
+		fmt.Println("Match!")
 		for k, v := range vars {
-			fmt.Println(k, v)
+			fmt.Printf("%s: %s\n", k, v)
 		}
 	} else {
 		fmt.Println("No match")
@@ -18,7 +17,6 @@ Easily get variables from any url.
 ```
 
 ## Installation
-
 ```bash
 go get github.com/Nigel2392/routevars
 ```
