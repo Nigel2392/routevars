@@ -68,12 +68,12 @@ const (
 	RT_PATH_REGEX_ALPHANUMERIC = "[0-9a-zA-Z_-]+"
 )
 
-var paths = make(map[string]string)
+// var paths = make(map[string]string)
 
 func Match(path, pathToMatch string) (bool, map[string]string) {
-	if path, ok := paths[path]; ok {
-		return matchRegex(path, pathToMatch)
-	}
+	// 	if path, ok := paths[path]; ok {
+	// 		return matchRegex(path, pathToMatch)
+	// 	}
 
 	if path == pathToMatch && !isRegexRoute(path) {
 		return true, nil
@@ -100,7 +100,7 @@ func Match(path, pathToMatch string) (bool, map[string]string) {
 		regex = regex + "/"
 	}
 
-	paths[path] = regex
+	//	paths[path] = regex
 
 	return matchRegex(regex, pathToMatch)
 }
