@@ -95,23 +95,6 @@ func Match(path, pathToMatch string) (bool, map[string]string) {
 
 	// Split the path into parts.
 	var parts = strings.Split(path, "/")
-	var otherParts = strings.Split(pathToMatch, "/")
-
-	// Quicker validation for paths which do not match.
-	if len(parts) != len(otherParts) {
-		return false, nil
-	}
-
-	// Quicker validation for paths which do not match.
-	for i, part := range parts {
-		if part == otherParts[i] {
-			continue
-		} else if isRegexRoutePart(part) {
-			// Do nothing
-		} else {
-			return false, nil
-		}
-	}
 
 	// The path likely exists, since we are here.
 	// We will now match the regex.
@@ -135,11 +118,6 @@ func Match(path, pathToMatch string) (bool, map[string]string) {
 // Check if a path is a regex route.
 func isRegexRoute(path string) bool {
 	return strings.Contains(path, RT_PATH_VAR_PREFIX) && strings.Contains(path, RT_PATH_VAR_SUFFIX)
-}
-
-// Checks if a part of a path is a regex route.
-func isRegexRoutePart(path string) bool {
-	return strings.HasPrefix(path, RT_PATH_VAR_PREFIX) && strings.HasSuffix(path, RT_PATH_VAR_SUFFIX)
 }
 
 func matchRegex(regex, pathToMatch string) (bool, map[string]string) {
