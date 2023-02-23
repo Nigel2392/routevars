@@ -71,27 +71,54 @@ const (
 // var paths = make(map[string]string)
 
 func Match(path, pathToMatch string) (bool, map[string]string) {
-	// 	if path, ok := paths[path]; ok {
-	// 		return matchRegex(path, pathToMatch)
-	// 	}
 
+	// Check if the path equals, if so, return true.
 	if path == pathToMatch && !isRegexRoute(path) {
 		return true, nil
 	}
 
 	var regex = ""
+	// Check wether the path contains trailing or leading slashes,
+	// store the answer for later.
 	var hasPrefixSlash = strings.HasPrefix(path, "/")
 	var hasTrailingSlash = strings.HasSuffix(path, "/")
+
+	// Remove leading slash if it exists.
 	if hasPrefixSlash {
 		path = path[1:]
 	}
+
+	// Remove trailing slash if it exists.
 	if hasTrailingSlash && len(path) > 1 && !hasPrefixSlash {
 		path = path[:len(path)-1]
 	}
+
+	// Split the path into parts.
 	var parts = strings.Split(path, "/")
+	var otherParts = strings.Split(pathToMatch, "/")
+
+	// Quicker validation for paths which do not match.
+	if len(parts) != len(otherParts) {
+		return false, nil
+	}
+
+	// Quicker validation for paths which do not match.
+	for i, part := range parts {
+		if part == otherParts[i] {
+			continue
+		} else if isRegexRoutePart(part) {
+			// Do nothing
+		} else {
+			return false, nil
+		}
+	}
+
+	// The path likely exists, since we are here.
+	// We will now match the regex.
 	for i, part := range parts {
 		parts[i] = toRegex(part)
 	}
+
 	regex = strings.Join(parts, "/")
 	if hasPrefixSlash {
 		regex = "/" + regex
@@ -110,6 +137,11 @@ func isRegexRoute(path string) bool {
 	return strings.Contains(path, RT_PATH_VAR_PREFIX) && strings.Contains(path, RT_PATH_VAR_SUFFIX)
 }
 
+// Checks if a part of a path is a regex route.
+func isRegexRoutePart(path string) bool {
+	return strings.HasPrefix(path, RT_PATH_VAR_PREFIX) && strings.HasSuffix(path, RT_PATH_VAR_SUFFIX)
+}
+
 func matchRegex(regex, pathToMatch string) (bool, map[string]string) {
 	var rex = regexp.MustCompile(regex)
 	var m = rex.FindStringSubmatch(pathToMatch)
@@ -119,7 +151,7 @@ func matchRegex(regex, pathToMatch string) (bool, map[string]string) {
 	if len(subNames) != len(m) {
 		return false, nil
 	}
-	for i, name := range rex.SubexpNames() {
+	for i, name := range subNames {
 		if i != 0 && name != "" {
 			vars[name] = m[i]
 		}
