@@ -3,6 +3,7 @@ package routevars
 import (
 	"regexp"
 	"strings"
+	"sync"
 )
 
 /*
@@ -120,8 +121,34 @@ func isRegexRoute(path string) bool {
 	return strings.Contains(path, RT_PATH_VAR_PREFIX) && strings.Contains(path, RT_PATH_VAR_SUFFIX)
 }
 
+type regexCache struct {
+	regex map[string]*regexp.Regexp
+	mu    sync.RWMutex
+}
+
+func (c *regexCache) get(key string) *regexp.Regexp {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return c.regex[key]
+}
+
+func (c *regexCache) set(key string, value *regexp.Regexp) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.regex[key] = value
+}
+
+var rexCache = regexCache{
+	regex: make(map[string]*regexp.Regexp),
+}
+
 func matchRegex(regex, pathToMatch string) (bool, map[string]string) {
-	var rex = regexp.MustCompile(regex)
+	// Check if the regex is cached.
+	var rex = rexCache.get(regex)
+	if rex == nil {
+		rex = regexp.MustCompile(regex)
+		rexCache.set(regex, rex)
+	}
 	var m = rex.FindStringSubmatch(pathToMatch)
 	// Get named capture groups
 	var vars = make(map[string]string, len(m))
