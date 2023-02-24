@@ -1,6 +1,7 @@
 package routevars_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/Nigel2392/routevars"
@@ -59,5 +60,13 @@ func TestMatch(t *testing.T) {
 	t.Log("Match passed: " + other)
 	for k, v := range vars {
 		t.Log(k, v)
+	}
+}
+
+func BenchmarkMatch(b *testing.B) {
+	var path = "/users/<<id:int>>/<<name:string>>"
+	var other = "/users/%d/john"
+	for i := 0; i < b.N; i++ {
+		routevars.Match(path, fmt.Sprintf(other, i))
 	}
 }
