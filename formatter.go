@@ -12,16 +12,34 @@ func (uf URLFormatter) Format(v ...any) string {
 	return FormatURL(string(uf), v...)
 }
 
+// Format the URL with the given arguments.
+func (uf URLFormatter) FormatSafe(v ...any) (string, error) {
+	return FormatURLSafe(string(uf), v...)
+}
+
 // Match the URL with another URL.
 func (uf URLFormatter) Match(other string) (bool, map[string]string) {
 	return Match(string(uf), other)
 }
 
 func FormatURL(path string, v ...any) string {
+	var url, _ = formatURL(false, path, v...)
+	return url
+}
+
+func FormatURLSafe(path string, v ...any) (string, error) {
+	return formatURL(true, path, v...)
+}
+
+// Format the URL with the given arguments.
+// If safe is true then the URL will be checked to make sure it matches the path.
+// If safe is false then the URL will not be checked, and no error will be returned.
+func formatURL(safe bool, path string, v ...any) (string, error) {
+	var originalPath = path
 	// If the length of the path is less than the length of the pre/suffix and the delimiter
 	// then there are no variables in the path
 	if len(path) <= len(RT_PATH_VAR_DELIM)+len(RT_PATH_VAR_PREFIX)+len(RT_PATH_VAR_SUFFIX) {
-		return path
+		return path, nil
 	}
 	// Remove the first and last slash if they exist
 	var hasPrefixSlash = strings.HasPrefix(path, "/")
@@ -42,6 +60,7 @@ func FormatURL(path string, v ...any) string {
 			}
 			var arg = v[0]
 			v = v[1:]
+
 			parts[i] = fmt.Sprintf("%v", arg)
 		}
 	}
@@ -54,5 +73,12 @@ func FormatURL(path string, v ...any) string {
 	if hasTrailingSlash {
 		path = path + "/"
 	}
-	return path
+
+	if safe {
+		if ok, _ := Match(originalPath, path); !ok {
+			return "", fmt.Errorf("invalid URL: %s", path)
+		}
+	}
+
+	return path, nil
 }
