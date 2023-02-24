@@ -7,8 +7,17 @@ import (
 
 type URLFormatter string
 
+// Format the URL with the given arguments.
 func (uf URLFormatter) Format(v ...any) string {
-	var path = string(uf)
+	return FormatURL(string(uf), v...)
+}
+
+// Match the URL with another URL.
+func (uf URLFormatter) Match(other string) (bool, map[string]string) {
+	return Match(string(uf), other)
+}
+
+func FormatURL(path string, v ...any) string {
 	// If the length of the path is less than the length of the pre/suffix and the delimiter
 	// then there are no variables in the path
 	if len(path) <= len(RT_PATH_VAR_DELIM)+len(RT_PATH_VAR_PREFIX)+len(RT_PATH_VAR_SUFFIX) {
