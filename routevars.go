@@ -45,12 +45,13 @@ const (
 
 // Router regex types.
 const (
-	NameInt    = "int"
-	NameString = "string"
-	NameSlug   = "slug"
-	NameUUID   = "uuid"
-	NameAny    = "any"
-	NameHex    = "hex"
+	NameInt      = "int"
+	NameString   = "string"
+	NameSlug     = "slug"
+	NameUUID     = "uuid"
+	NameAny      = "any"
+	NameHex      = "hex"
+	NameAlphaNum = "num"
 )
 
 // Router regex patterns
@@ -67,6 +68,8 @@ const (
 	RT_PATH_REGEX_UUID = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
 	// Match any alphanumeric string
 	RT_PATH_REGEX_ALPHANUMERIC = "[0-9a-zA-Z_-]+"
+	// Match any slug
+	RT_PATH_REGEX_SLUG = "[0-9a-zA-Z_-]+"
 )
 
 // var paths = make(map[string]string)
@@ -195,14 +198,18 @@ func typToRegx(typ string) string {
 	switch typ {
 	case NameInt:
 		return RT_PATH_REGEX_NUM
-	case NameString, NameSlug:
-		return RT_PATH_REGEX_ALPHANUMERIC
+	case NameString:
+		return RT_PATH_REGEX_STR
+	case NameSlug:
+		return RT_PATH_REGEX_SLUG
 	case NameUUID:
 		return RT_PATH_REGEX_UUID
 	case NameAny:
 		return RT_PATH_REGEX_ANY
 	case NameHex:
 		return RT_PATH_REGEX_HEX
+	case NameAlphaNum:
+		return RT_PATH_REGEX_ALPHANUMERIC
 	default:
 		return RT_PATH_REGEX_STR
 	}
