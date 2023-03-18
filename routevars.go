@@ -51,7 +51,7 @@ const (
 	NameUUID     = "uuid"
 	NameAny      = "any"
 	NameHex      = "hex"
-	NameAlphaNum = "num"
+	NameAlphaNum = "alphanum"
 )
 
 // Router regex patterns
